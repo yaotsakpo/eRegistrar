@@ -1,6 +1,9 @@
 package eRegistrar.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -8,14 +11,17 @@ import java.util.List;
 public class Block {
 
     @Id
-    @GeneratedValue
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int blockID;
 
     private String blockName;
 
+    @NotNull(message = "* Starting date is required")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startingDate;
 
+    @NotNull(message = "* Ending date is required")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endingDate;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -24,7 +30,14 @@ public class Block {
     public Block() {
     }
 
-    public Block( String blockName, LocalDate startingDate, LocalDate endingDate) {
+    public Block(int blockID, String blockName, LocalDate startingDate, LocalDate endingDate) {
+        this.blockID = blockID;
+        this.blockName = blockName;
+        this.startingDate = startingDate;
+        this.endingDate = endingDate;
+    }
+
+    public Block(String blockName, LocalDate startingDate, LocalDate endingDate) {
         this.blockName = blockName;
         this.startingDate = startingDate;
         this.endingDate = endingDate;
@@ -69,5 +82,14 @@ public class Block {
 
     public void setRegistrationList(List<Registration> registrationList) {
         this.registrationList = registrationList;
+    }
+
+    @Override
+    public String toString() {
+        return "Block{" +
+                "blockName='" + blockName + '\'' +
+                ", startingDate=" + startingDate +
+                ", endingDate=" + endingDate +
+                '}';
     }
 }

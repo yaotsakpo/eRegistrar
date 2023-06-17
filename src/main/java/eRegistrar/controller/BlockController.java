@@ -1,8 +1,10 @@
 package eRegistrar.controller;
 
 import eRegistrar.model.Block;
+import eRegistrar.model.Course;
 import eRegistrar.service.BlockService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,8 +26,9 @@ public class BlockController {
         List<Block> Blocks = BlockService.getAllBlocks();
         modelAndView.addObject("Blocks", Blocks);
         modelAndView.addObject("searchString", "");
-        modelAndView.addObject("BlocksCount", Blocks.size());
-        modelAndView.setViewName("Block/list");
+        modelAndView.addObject("BlocsCount", Blocks.size());
+        modelAndView.addObject("Block", new Block());
+        modelAndView.setViewName("Block/blockList");
         return modelAndView;
     }
 
@@ -40,22 +43,15 @@ public class BlockController {
                              BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("errors", bindingResult.getAllErrors());
-            return "Block/new";
+            return "Block/blockList";
         }
         Block = BlockService.saveBlock(Block);
         return "redirect:/eRegistrar/Block/list";
     }
 
     @GetMapping(value = {"/eRegistrar/Block/edit/{BlockId}","/Block/edit/{BlockId}"})
-    public String editBlock(@PathVariable Integer BlockId, Model model) {
-        Block Block = BlockService.getBlockById(BlockId);
-        if (Block != null) {
-            model.addAttribute("Block", Block);
-            return "Block/edit";
-        } else {
-            // TODO
-        }
-        return "Block/list";
+    public ResponseEntity<Block> editBlock(@PathVariable Integer BlockId, Model model) {
+        return ResponseEntity.ok().body(BlockService.getBlockById(BlockId));
     }
 
     @PostMapping(value = {"/eRegistrar/Block/edit","/Block/edit"})
@@ -82,7 +78,13 @@ public class BlockController {
         modelAndView.addObject("Blocks", Blocks);
         modelAndView.addObject("searchString", searchString);
         modelAndView.addObject("BlocksCount", Blocks.size());
-        modelAndView.setViewName("Block/list");
+        modelAndView.setViewName("Block/blockList");
         return modelAndView;
+    }
+
+    @GetMapping(value = {"/eRegistrar/Block/search/{searchString}", "/Student/Block/{searchString}"})
+    public ResponseEntity<?> searchCoursesUsingAjax(@PathVariable String searchString) {
+        List<Block> blocs = BlockService.searchBlocks(searchString);
+        return ResponseEntity.ok().body(blocs);
     }
 }

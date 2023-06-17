@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/mainLayout}">>
+<head>
+    <title>eLibrary - a demo spring boot webapp featuring CRUD - List Blocs</title>
+</head>
+<body>
+<div style="margin-top:1em;margin-bottom:1em;" class="container" layout:fragment="content">
+    <div>
+        <span style="font-size: 2em; color: #32a5e7;">Blocs in our Collection</span>
+        <span style="float:right;">
+                <a class="btn btn-outline-success btn-lg" href="#" id="addNewBlocBtn">Add a new Bloc</a>
+            </span>
+    </div>
+    <!-- Search panel -->
+    <div style="margin-top:1em;" class="row">
+        <div class="col-md-12">
+            <div class="input-group">
+                <input type="text" class="form-control" id="searchString" name="searchString" placeholder="Enter a string to search for Blocs" th:value="${searchString}" autofocus />
+                <div class="input-group-append">
+                    <button id="btnSubmit" type="submit" class="btn btn-outline-success">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="font-size: 1em">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Starting</th>
+                <th scope="col">endingDate</th>
+                <th scope="col">&nbsp;Action </th>
+                <th scope="col">&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody id="blocListTable">
+            <tr th:each="bloc,iterStat : ${Blocks}">
+                <th scope="row" th:text="${iterStat.count}+${'.'}"></th>
+                <td th:text="${bloc.blockName}"></td>
+                <td th:text="${bloc.startingDate}"></td>
+                <td th:text="${bloc.endingDate}"></td>
+                <td><a href="#" th:onclick="'loadBloc(\'' + ${bloc.blockID} + '\')'" >Edit</a> |
+                    <a th:href="@{'/eRegistrar/Block/delete/{blockID}'(blockID=${bloc.blockID})}">Delete</a>
+                </td>
+            </tr>
+            <tr th:if="${BlocsCount < 1}">
+                <td colspan="8" th:align="center">No courses found</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- New Bloc Modal -->
+    <div class="modal" id="newBlocModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newBlocModalTitle">New Bloc Form</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="newcourseForm" method="post" action="/eRegistrar/Block/new" th:object="${Block}">
+                    <fieldset>
+                        <input type="hidden" name="blockID" th:value="${Block.blockID}"/>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="blockName">Name</label>
+                                    <span th:if="${#fields.hasErrors('blockName')}" th:errors="*{blockName}"
+                                          class="alert alert-danger"></span>
+                                    <input id="blockName" name="blockName" type="text" class="form-control"
+                                           th:value="${Block.blockName}" autofocus required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="startingDate">Stating Date</label>
+                                    <span th:if="${#fields.hasErrors('startingDate')}" th:errors="*{startingDate}"
+                                          class="alert alert-danger"></span>
+                                    <input id="startingDate" name="startingDate" type="date" class="form-control"
+                                           th:value="${Block.startingDate}" autofocus required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="endingDate">Ending Date</label>
+                                    <span th:if="${#fields.hasErrors('endingDate')}" th:errors="*{endingDate}"
+                                          class="alert alert-danger"></span>
+                                    <input id="endingDate" name="endingDate" type="date" class="form-control"
+                                           th:value="${Block.endingDate}" autofocus required>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="float:right;">
+                            <button id="btnSubmit" type="submit" class="btn btn-outline-success">Save course</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Bloc Modal -->
+    <div class="modal" id="updateBlocModal" tabindex="-1" role="dialog" aria-labelledby="updateBlocModalTitle"
+         aria-hidden="true">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateBlocModalTitle">Update Bloc Form</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="updateBlocForm" method="post" action="/eRegistrar/Block/edit" th:object="${Block}">
+                    <fieldset>
+                        <input type="hidden" id="updateBlocId" name="blockID" th:value="${Block.blockID}" />
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="updateBlocName">Name</label>
+                                    <span th:if="${#fields.hasErrors('blockName')}" th:errors="*{blockName}"
+                                          class="alert alert-danger"></span>
+                                    <input id="updateBlocName" name="blockName" type="text"
+                                           class="form-control" th:value="${Block.blockName}" autofocus required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="updateStartingDate">Stating Date</label>
+                                    <span th:if="${#fields.hasErrors('startingDate')}" th:errors="*{startingDate}"
+                                          class="alert alert-danger"></span>
+                                    <input id="updateStartingDate" name="startingDate" type="date"
+                                           class="form-control" th:value="${Block.startingDate}" autofocus required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="updateEndingDate">Ending Date</label>
+                                    <span th:if="${#fields.hasErrors('endingDate')}" th:errors="*{endingDate}"
+                                          class="alert alert-danger"></span>
+                                    <input id="updateEndingDate" name="endingDate" type="date"
+                                           class="form-control" th:value="${Block.endingDate}" autofocus required>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div style="float:right;">
+                            <button id="btnSubmit" type="submit" class="btn btn-outline-success">Update course</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+
+<div layout:fragment="jscontent">
+    <script type="text/javascript" th:src="@{/js/bloc.js}"></script>
+</div>
+</body>
+</html>
