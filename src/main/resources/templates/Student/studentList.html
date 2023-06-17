@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/mainLayout}">
+<head>
+    <title>eRegistrar - a demo spring boot webapp featuring CRUD - List Students</title>
+</head>
+<body>
+
+    <div style="margin-top:1em;margin-bottom:1em;" class="container" layout:fragment="content">
+        <div>
+            <span style="font-size: 2em; color: #32a5e7;">Students in our Collection</span>
+            <span style="float:right;">
+                <a class="btn btn-outline-success btn-lg" href="#" id="addNewStudenBtn">Add a new Student</a>
+            </span>
+        </div>
+        <!-- Search panel -->
+        <div style="margin-top:1em;" class="row">
+            <div class="col-md-12">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchString" name="searchString" placeholder="Enter a string to search for Students" th:value="${searchString}" autofocus />
+                    <div class="input-group-append">
+                        <button id="btnSubmit" type="submit" class="btn btn-outline-success">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="font-size: 1em">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Student Number</th>
+                    <th scope="col">Firstname</th>
+                    <th scope="col">middleName</th>
+                    <th scope="col">lastName</th>
+                    <th scope="col">cgpa</th>
+                    <th scope="col">enrollmentDate</th>
+                    <th scope="col">isInternational</th>
+                    <th scope="col">&nbsp;Action </th>
+                    <th scope="col">&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody id="studentListTable" >
+                <tr th:each="Student,iterStat : ${Students}">
+                    <th scope="row" th:text="${iterStat.count}+${'.'}"></th>
+                    <td th:text="${Student.studentNumber}"></td>
+                    <td th:text="${Student.firstName}"></td>
+                    <td th:text="${Student.middleName}"></td>
+                    <td th:text="${Student.lastName}"></td>
+                    <td th:text="${Student.cgpa}"></td>
+                    <td th:text="${Student.enrollmentDate}"></td>
+                    <td th:if="${Student.isInternational == true}">
+                        Yes
+                    </td>
+                    <td th:if="${Student.isInternational == false}">
+                        No
+                    </td>
+                    <td><a href="#" th:onclick="'loadStudent(\'' + ${Student.studentID} + '\')'" >Edit</a> |
+                        <a th:href="@{'/eRegistrar/Student/delete/{StudentId}'(StudentId=${Student.studentID})}">Delete</a>
+                    </td>
+
+                </tr>
+                <tr th:if="${StudentsCount < 1}">
+                    <td colspan="8" th:align="center">No Students found</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- New Student Modal -->
+        <div class="modal" id="newStudentModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="newStudentModalTitle">New Student Form</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="newstudentForm" method="post" action="/eRegistrar/Student/new" th:object="${Student}">
+                            <fieldset>
+                                <input type="hidden" name="studentId" th:value="${Student.studentID}"/>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="studentNumber">Number</label>
+                                            <span th:if="${#fields.hasErrors('studentNumber')}" th:errors="*{studentNumber}"
+                                                  class="alert alert-danger"></span>
+                                            <input id="studentNumber" name="studentNumber" type="text" class="form-control"
+                                                   th:value="${Student.studentNumber}" autofocus required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="firstName">FirstName</label>
+                                            <span th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"
+                                                  class="alert alert-danger"></span>
+                                            <input id="firstName" name="firstName" type="text" class="form-control"
+                                                   th:value="${Student.firstName}" autofocus required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="middleName">MiddleName</label>
+                                            <span th:if="${#fields.hasErrors('middleName')}" th:errors="*{middleName}"
+                                                  class="alert alert-danger"></span>
+                                            <input id="middleName" name="middleName" type="text" class="form-control"
+                                                   th:value="${Student.middleName}" autofocus>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="lastName">lastName</label>
+                                            <span th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"
+                                                  class="alert alert-danger"></span>
+                                            <input id="lastName" name="lastName" type="text" class="form-control"
+                                                   th:value="${Student.lastName}" autofocus required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="cgpa">Cgpa</label>
+                                            <span th:if="${#fields.hasErrors('cgpa')}" th:errors="*{cgpa}"
+                                                  class="alert alert-danger"></span>
+                                            <input id="cgpa" name="cgpa" type="number" step="any" class="form-control"
+                                                   th:value="${Student.cgpa}" autofocus>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="enrollmentDate">Enrollment Date</label>
+                                            <span th:if="${#fields.hasErrors('enrollmentDate')}" th:errors="*{enrollmentDate}"
+                                                  class="alert alert-danger"></span>
+                                            <input id="enrollmentDate" name="enrollmentDate" type="date" class="form-control"
+                                                   th:value="${Student.enrollmentDate}" autofocus required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="internationalCheckbox" autofocus >
+                                            <label class="form-check-label" for="internationalCheckbox">
+                                                International Student
+                                            </label>
+                                            <input id="isInternational" hidden name="isInternational" th:field="${Student.isInternational}">
+                                            <span th:if="${#fields.hasErrors('isInternational')}" th:errors="*{isInternational}"
+                                                  class="alert alert-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="float:right;">
+                                    <button id="btnSubmit" type="submit" class="btn btn-outline-success">Save student</button>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+
+        </div>
+
+        <!-- Update Student Modal -->
+        <div class="modal" id="updateStudentModal" tabindex="-1" role="dialog" aria-labelledby="updateStudentModalTitle"
+             aria-hidden="true">
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="updateStudentModalTitle">Update Student Form</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="updateStudentForm" method="post" action="/eRegistrar/Student/edit" th:object="${Student}">
+                            <fieldset>
+                                <input type="hidden" id="updateStudentId" name="studentID" th:value="${Student.studentID}" />
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="updateStudentNumber">Number</label>
+                                            <span th:if="${#fields.hasErrors('studentNumber')}" th:errors="*{studentNumber}"
+                                                  class="alert alert-danger"></span>
+                                            <input id="updateStudentNumber" name="studentNumber" type="text"
+                                                   class="form-control" th:value="${Student.studentNumber}" autofocus required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="updatefirstName">firstName</label>
+                                            <span th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"
+                                                  class="alert alert-danger"></span>
+                                            <input id="updatefirstName" name="firstName" type="text" class="form-control"
+                                                   th:value="${Student.firstName}" autofocus required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="updatemiddleName">middleName</label>
+                                            <span th:if="${#fields.hasErrors('middleName')}" th:errors="*{middleName}"
+                                                  class="alert alert-danger"></span>
+                                            <input id="updatemiddleName" name="middleName" type="text" class="form-control"
+                                                   th:value="${Student.middleName}" autofocus>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="updatelastName">lastName</label>
+                                            <span th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"
+                                                  class="alert alert-danger"></span>
+                                            <input id="updatelastName" name="lastName" type="text" class="form-control"
+                                                   th:value="${Student.lastName}" autofocus required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="updateCgpa">Cgpa</label>
+                                            <span th:if="${#fields.hasErrors('cgpa')}" th:errors="*{cgpa}"
+                                                  class="alert alert-danger"></span>
+                                            <input id="updateCgpa" name="cgpa" type="number" step="any" class="form-control"
+                                                   th:value="${Student.cgpa}" autofocus>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="updateEnrollmentDate">Enrollment Date</label>
+                                            <span th:if="${#fields.hasErrors('enrollmentDate')}" th:errors="*{enrollmentDate}"
+                                                  class="alert alert-danger"></span>
+                                            <input id="updateEnrollmentDate" name="enrollmentDate" type="date"
+                                                   class="form-control" th:value="${Student.enrollmentDate}" autofocus required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="UpdateInternationalCheckbox"
+                                                   autofocus>
+                                            <label class="form-check-label" for="UpdateInternationalCheckbox">
+                                                International Student
+                                            </label>
+                                            <input id="updateIsInternational" hidden name="isInternational"
+                                                   th:field="${Student.isInternational}">
+                                            <span th:if="${#fields.hasErrors('isInternational')}" th:errors="*{isInternational}"
+                                                  class="alert alert-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="float:right;">
+                                    <button id="btnSubmit" type="submit" class="btn btn-outline-success">Update student</button>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+
+                    </div>
+                </div>
+
+        </div>
+
+
+    </div>
+
+    <div layout:fragment="jscontent">
+        <script type="text/javascript" th:src="@{/js/student.js}"></script>
+    </div>
+
+</body>
+</html>

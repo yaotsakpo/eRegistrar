@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/mainLayout}">
+<head>
+    <title>eLibrary - a demo spring boot webapp featuring CRUD - List Courses</title>
+</head>
+<body>
+
+    <div style="margin-top:1em;margin-bottom:1em;" class="container" layout:fragment="content">
+        <div>
+            <span style="font-size: 2em; color: #32a5e7;">Courses in our Collection</span>
+            <span style="float:right;">
+                <a class="btn btn-outline-success btn-lg" href="#" id="addNewCourseBtn">Add a new Course</a>
+            </span>
+        </div>
+        <!-- Search panel -->
+        <div style="margin-top:1em;" class="row">
+            <div class="col-md-12">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchString" name="searchString" placeholder="Enter a string to search for Courses" th:value="${searchString}" autofocus />
+                    <div class="input-group-append">
+                        <button id="btnSubmit" type="submit" class="btn btn-outline-success">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="font-size: 1em">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">&nbsp;Action </th>
+                    <th scope="col">&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody id="courseListTable">
+                <tr th:each="course,iterStat : ${Courses}">
+                    <th scope="row" th:text="${iterStat.count}+${'.'}"></th>
+                    <td th:text="${course.courseName}"></td>
+                    <td><a href="#" th:onclick="'loadCourse(\'' + ${course.courseID} + '\')'" >Edit</a> |
+                        <a th:href="@{'/eRegistrar/Course/delete/{courseID}'(courseID=${course.courseID})}">Delete</a>
+                    </td>
+                </tr>
+                <tr th:if="${CoursesCount < 1}">
+                    <td colspan="8" th:align="center">No courses found</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- New Course Modal -->
+        <div class="modal" id="newCourseModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newCourseModalTitle">New Course Form</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="newcourseForm" method="post" action="/eRegistrar/Course/new" th:object="${Course}">
+                        <fieldset>
+                            <input type="hidden" name="courseID" th:value="${Course.courseID}"/>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="courseName">Name</label>
+                                        <span th:if="${#fields.hasErrors('courseName')}" th:errors="*{courseName}"
+                                              class="alert alert-danger"></span>
+                                        <input id="courseName" name="courseName" type="text" class="form-control"
+                                               th:value="${Course.courseName}" autofocus required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="float:right;">
+                                <button id="btnSubmit" type="submit" class="btn btn-outline-success">Save course</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Update Course Modal -->
+        <div class="modal" id="updateCourseModal" tabindex="-1" role="dialog" aria-labelledby="updateCourseModalTitle"
+             aria-hidden="true">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateCourseModalTitle">Update Course Form</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateCourseForm" method="post" action="/eRegistrar/Course/edit" th:object="${Course}">
+                        <fieldset>
+                            <input type="hidden" id="updateCourseId" name="courseID" th:value="${Course.courseID}" />
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="updateCourseName">Number</label>
+                                        <span th:if="${#fields.hasErrors('courseName')}" th:errors="*{courseName}"
+                                              class="alert alert-danger"></span>
+                                        <input id="updateCourseName" name="courseName" type="text"
+                                               class="form-control" th:value="${Course.courseName}" autofocus required>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div style="float:right;">
+                                <button id="btnSubmit" type="submit" class="btn btn-outline-success">Update course</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div layout:fragment="jscontent">
+        <script type="text/javascript" th:src="@{/js/course.js}"></script>
+    </div>
+</body>
+</html>

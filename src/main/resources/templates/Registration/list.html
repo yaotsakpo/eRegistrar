@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>eRegistrar - a demo spring boot webapp featuring CRUD - List Courses</title>
+
+</head>
+<body>
+
+    <div style="margin-top:1em;margin-bottom:1em;" class="container">
+        <div>
+            <span style="font-size: 2em; color: #32a5e7;">Books in our Collection</span>
+            <span style="float:right;">
+                <a class="btn btn-outline-success btn-lg" href="/elibrary/book/new">Add a new book</a>
+            </span>
+        </div>
+        <!-- Search panel -->
+        <form id="searchBookForm" method="get" action="/elibrary/book/search">
+            <div style="margin-top:1em;" class="row">
+                <div class="col-md-12">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="searchString" name="searchString" placeholder="Enter a string to search for books" th:value="${searchString}" autofocus />
+                        <div class="input-group-append">
+                            <button id="btnSubmit" type="submit" class="btn btn-outline-success">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div style="font-size: 1em">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">ISBN</th>
+                    <th scope="col">Book Title</th>
+                    <th scope="col">Overdue Fee</th>
+                    <th scope="col">Publisher</th>
+                    <th scope="col">Date Published</th>
+                    <th scope="col">&nbsp;</th>
+                    <th scope="col">&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="book,iterStat : ${books}">
+
+                </tr>
+                <tr th:if="${booksCount < 1}">
+                    <td colspan="8" th:align="center">No books found</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+</body>
+</html>
